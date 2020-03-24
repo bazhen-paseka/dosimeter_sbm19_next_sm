@@ -16,8 +16,8 @@
 *
 */
 
-#ifndef DOSIMETER_SBM19_SM_H_INCLUDED
-#define DOSIMETER_SBM19_SM_H_INCLUDED
+#ifndef DOSIMETER_SBM19_NEXT_SM_H_INCLUDED
+#define DOSIMETER_SBM19_NEXT_SM_H_INCLUDED
 
 /*
 **************************************************************************
@@ -30,14 +30,14 @@
 	#include "usart.h"
 	#include "stdio.h"
 	#include <string.h>
+	#include "dosimeter_sbm19_next_local_config.h"
+	#include "tm1637_sm.h"
 /*
 **************************************************************************
 *								    DEFINES
 **************************************************************************
 */
-	#define SOFT_VERSION 			110
-	#define	START_RADIATION_VALUE	95
-	#define	VALUE_ARRAY_CNT			100
+
 /*
 **************************************************************************
 *								   DATA TYPES
@@ -61,9 +61,9 @@
 *                              FUNCTION PROTOTYPES
 **************************************************************************
 */
-	void Dozimeter_Init(void);
-	void Dozimeter_Main(void);
+	void Dozimeter_Init(UART_HandleTypeDef * _uart_debug);
+	void Dozimeter_Main(UART_HandleTypeDef * _uart_debug, tm1637_struct * _h_tm1637);
 	void Dozimeter_set_TIM3_flag(uint8_t _flag);
 	void Dozimeter_set_time_between_electrons(void);
 
-#endif /* DOSIMETER_SBM19_SM_H_INCLUDED */
+#endif /* DOSIMETER_SBM19_NEXT_SM_H_INCLUDED */
