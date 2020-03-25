@@ -61,8 +61,8 @@
 
 	uint8_t 	tim3_flag_u8 			= 0;
 	uint8_t		update_flag_u8 			= 0;
-	uint8_t 	led_count_u8			= 0;
 	uint8_t		electron_array_count_u8	= 0;
+	uint8_t		led_count_u8			= 0;
 	uint32_t	electron_hard_count_u32	= 0;
 	uint32_t 	radiation_u32_arr[VALUE_ARRAY_CNT];
 
@@ -88,7 +88,9 @@ void Dozimeter_set_TIM3_flag(uint8_t _flag) {
 void Dozimeter_set_time_between_electrons(void) {
 	HAL_GPIO_TogglePin(LED_BOARD_GPIO_Port, LED_BOARD_Pin);
 	electron_array_count_u8++;
-	if (electron_array_count_u8 >= VALUE_ARRAY_CNT) electron_array_count_u8 = 0;
+	if (electron_array_count_u8 >= VALUE_ARRAY_CNT) {
+		electron_array_count_u8 = 0;
+	}
 	radiation_u32_arr[electron_array_count_u8] = TIM4->CNT;
 	TIM4->CNT = 0;
 	electron_hard_count_u32++;
@@ -129,7 +131,6 @@ void Dozimeter_Main(UART_HandleTypeDef * _uart_debug, tm1637_struct * _h_tm1637)
 	//************************************************************************
 
 	if (update_flag_u8 > 0) {
-
 		uint32_t summa_of_all_array_u32 = 0;
 		for (int i=0; i<VALUE_ARRAY_CNT; i++) {
 			summa_of_all_array_u32 = summa_of_all_array_u32 + radiation_u32_arr[i];
@@ -145,7 +146,11 @@ void Dozimeter_Main(UART_HandleTypeDef * _uart_debug, tm1637_struct * _h_tm1637)
 
 		Print_radiation(qnt_electrons_per_60sec_u32, _h_tm1637);
 
-		LED_Blink(electron_array_count_u8%4);
+		led_count_u8++;
+		if (led_count_u8>=6) {
+			led_count_u8 = 0;
+		}
+		LED_Blink(led_count_u8);
 		update_flag_u8 = 0;
 	}
 }
@@ -157,11 +162,19 @@ void Dozimeter_Main(UART_HandleTypeDef * _uart_debug, tm1637_struct * _h_tm1637)
 */
 
 void LED_Blink(uint8_t _position_u8) {
+
+	HAL_GPIO_WritePin(LED_BLUE_1_GPIO_Port,	LED_BLUE_1_Pin, RESET);
+	HAL_GPIO_WritePin(LED_BLUE_2_GPIO_Port,	LED_BLUE_2_Pin, RESET);
+	HAL_GPIO_WritePin(LED_BLUE_3_GPIO_Port,	LED_BLUE_3_Pin, RESET);
+	HAL_GPIO_WritePin(LED_BLUE_4_GPIO_Port,	LED_BLUE_4_Pin, RESET);
+
 	switch (_position_u8) {
-//		case 0: HAL_GPIO_WritePin(LED__GREEN_GPIO_Port,	LED__GREEN_Pin,	RESET); break;
-//		case 1: HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port,	LED_YELLOW_Pin, RESET); break;
-//		case 2: HAL_GPIO_WritePin(LED____RED_GPIO_Port,	LED____RED_Pin,	RESET);	break;
-//		case 3: HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port,	LED_YELLOW_Pin, RESET); break;
+		case 0: HAL_GPIO_WritePin(LED_BLUE_1_GPIO_Port, LED_BLUE_1_Pin, SET); break;
+		case 1: HAL_GPIO_WritePin(LED_BLUE_2_GPIO_Port,	LED_BLUE_2_Pin, SET); break;
+		case 2: HAL_GPIO_WritePin(LED_BLUE_3_GPIO_Port,	LED_BLUE_3_Pin, SET); break;
+		case 3: HAL_GPIO_WritePin(LED_BLUE_4_GPIO_Port,	LED_BLUE_4_Pin, SET); break;
+		case 4: HAL_GPIO_WritePin(LED_BLUE_3_GPIO_Port,	LED_BLUE_3_Pin, SET); break;
+		case 5: HAL_GPIO_WritePin(LED_BLUE_2_GPIO_Port,	LED_BLUE_2_Pin, SET); break;
 		default: break;
 	}
 }
