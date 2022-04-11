@@ -66,5 +66,6 @@
 	void Dozimeter_Main(UART_HandleTypeDef * _uart_debug, tm1637_struct * _h_tm1637);
 	void Dozimeter_set_TIM3_flag(uint8_t _flag);
 	void Dozimeter_set_time_between_electrons(void);
+	void LED_Blink(uint8_t _position_u8);
 
 #endif /* DOSIMETER_SBM19_NEXT_SM_H_INCLUDED */
