@@ -71,7 +71,6 @@
 *                        LOCAL FUNCTION PROTOTYPES
 **************************************************************************
 */
-	void LED_Blink(uint8_t _position_u8);
 	void Print_radiation(uint32_t _radiation_u32, tm1637_struct * _h_tm1637);
 
 /*
@@ -105,17 +104,30 @@ void Dozimeter_Init(UART_HandleTypeDef * _uart_debug) {
 	soft_version_arr_int[2] = ((SOFT_VERSION)      ) %10 ;
 
 	char DataChar[100];
-	sprintf(DataChar,"\r\n\r\n\tDosimeter SBM-19 Next 2020-march-24 v%d.%d.%d \r\n\tUART1 for debug on speed 115200/8-N-1\r\n\r\n",
+	sprintf(DataChar,"\r\n\r\n Dosimeter SBM-19-Next 2022-April-11 v%d.%d.%d \r\n",
 			soft_version_arr_int[0], soft_version_arr_int[1], soft_version_arr_int[2]);
 	HAL_UART_Transmit(_uart_debug, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+	#define 	DATE_as_int_str 	(__DATE__)
+	#define 	TIME_as_int_str 	(__TIME__)
+	sprintf(DataChar," Build: %s. Time: %s\r\n" ,
+		DATE_as_int_str ,
+		TIME_as_int_str ) ;
+	HAL_UART_Transmit( _uart_debug, (uint8_t *)DataChar, strlen(DataChar), 100);
+
+	sprintf(DataChar," UART1 for debug on speed 115200/8-N-1\r\n\r\n" ) ;
+	HAL_UART_Transmit(_uart_debug, (uint8_t *)DataChar, strlen(DataChar), 100);
+
 
 	for (int i=0; i<VALUE_ARRAY_CNT; i++) {
 	  radiation_u32_arr[i] = 60000 / START_RADIATION_VALUE;
 	}
 
-	HAL_TIM_Base_Start(&htim3);
+	//HAL_TIM_Base_Start(&htim3);
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start(&htim4);
+	tim3_flag_u8 = 0 ;
+
 }
 //************************************************************************
 
@@ -123,7 +135,7 @@ void Dozimeter_Main(UART_HandleTypeDef * _uart_debug, tm1637_struct * _h_tm1637)
 	char DataChar[100];
 
 	if (tim3_flag_u8 == 1) {
-		sprintf(DataChar,"\t\t\t\tTIM3 60Sec. Hard_CNT= %d imp;\r\n", (int)electron_hard_count_u32);
+		sprintf(DataChar," TIM3-60Sec. hard_cnt= %d imp\r\n\r\n", (int)electron_hard_count_u32);
 		HAL_UART_Transmit(_uart_debug, (uint8_t *)DataChar, strlen(DataChar), 100);
 		electron_hard_count_u32 = 0;
 		tim3_flag_u8 = 0;
